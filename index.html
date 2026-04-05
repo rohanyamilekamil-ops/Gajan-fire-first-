@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gajan Token System</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; text-align: center; }
+        .card { border: 1px solid #444; padding: 20px; margin: 20px auto; width: 300px; border-radius: 10px; }
+        input { margin: 5px; padding: 10px; width: 80%; }
+        button { padding: 10px 20px; background: #e74c3c; color: white; border: none; cursor: pointer; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <h1>GAJAN TOKEN SYSTEM</h1>
+
+    <div id="login-section" class="card">
+        <h3>Admin/User Login</h3>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+
+    <div id="admin-panel" class="card hidden">
+        <h2>Admin Dashboard (MRGAJAN)</h2>
+        <p>Manage User Tokens</p>
+        <input type="text" id="target-uid" placeholder="User UID">
+        <input type="number" id="token-amount" placeholder="Tokens to Add">
+        <button onclick="updateTokens()">Update Balance</button>
+    </div>
+
+    <div id="user-dashboard" class="card hidden">
+        <h2>User Wallet</h2>
+        <p>Token Name: <b>GAJAN TOKEN</b></p>
+        <h3 id="balance-display">Balance: 0</h3>
+        <div id="qr-section">
+            <p>Scan to Buy Tokens</p>
+            <img id="qr-image" src="" alt="Payment QR" style="width:150px;">
+        </div>
+        <button onclick="requestWithdrawal()">Request Withdrawal</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
