@@ -2,47 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Gajan Token System</title>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR GAJAN - FREE FIRE CLONE HUB</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        body { font-family: sans-serif; background: #1a1a1a; color: white; text-align: center; }
-        .card { border: 1px solid #444; padding: 20px; margin: 20px auto; width: 300px; border-radius: 10px; }
-        input { margin: 5px; padding: 10px; width: 80%; }
-        button { padding: 10px 20px; background: #e74c3c; color: white; border: none; cursor: pointer; }
+        body { margin: 0; background: #050505; color: #fff; font-family: 'Courier New', monospace; overflow-x: hidden; }
+        .game-header { background: linear-gradient(90deg, #e74c3c, #8e44ad); padding: 15px; text-align: center; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.5); }
+        .container { display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: #1a1a1a; border: 1px solid #333; border-radius: 15px; padding: 20px; width: 90%; max-width: 500px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        input { width: 90%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #e74c3c; color: #fff; border-radius: 5px; }
+        button { width: 95%; padding: 15px; background: #e74c3c; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; }
         .hidden { display: none; }
+        
+        /* 3D MAP SIMULATOR VISUAL */
+        #game-view { width: 100%; height: 250px; background: url('https://w0.peakpx.com/wallpaper/74/921/HD-wallpaper-garena-free-fire-bermuda-map-thumbnail.jpg'); background-size: cover; border-radius: 10px; border: 2px solid #555; position: relative; overflow: hidden; }
+        .player-dot { width: 10px; height: 10px; background: lime; border-radius: 50%; position: absolute; box-shadow: 0 0 10px lime; animation: move 5s infinite; }
+        @keyframes move { 0% {top: 20%; left: 20%;} 50% {top: 70%; left: 80%;} 100% {top: 20%; left: 20%;} }
     </style>
 </head>
 <body>
 
-    <h1>GAJAN TOKEN SYSTEM</h1>
+<div class="game-header">
+    <h1>GAJAN FREE FIRE ELITE</h1>
+</div>
 
-    <div id="login-section" class="card">
-        <h3>Admin/User Login</h3>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="login()">Login</button>
+<div class="container">
+    <div id="login-box" class="card">
+        <h3>SECURE LOGIN</h3>
+        <input type="text" id="user" placeholder="MRGAJAN or UID">
+        <input type="password" id="pass" placeholder="PASSWORD">
+        <button onclick="login()">Enter Battlefield</button>
     </div>
 
-    <div id="admin-panel" class="card hidden">
-        <h2>Admin Dashboard (MRGAJAN)</h2>
-        <p>Manage User Tokens</p>
-        <input type="text" id="target-uid" placeholder="User UID">
-        <input type="number" id="token-amount" placeholder="Tokens to Add">
-        <button onclick="updateTokens()">Update Balance</button>
-    </div>
-
-    <div id="user-dashboard" class="card hidden">
-        <h2>User Wallet</h2>
-        <p>Token Name: <b>GAJAN TOKEN</b></p>
-        <h3 id="balance-display">Balance: 0</h3>
-        <div id="qr-section">
-            <p>Scan to Buy Tokens</p>
-            <img id="qr-image" src="" alt="Payment QR" style="width:150px;">
+    <div id="game-hub" class="hidden card">
+        <h2 id="welcome-msg">WELCOME, SOLDIER</h2>
+        <div id="game-view">
+            <div class="player-dot"></div>
+            <div style="position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 5px; font-size: 10px;">MAP: RANDOM BERMUDA</div>
         </div>
-        <button onclick="requestWithdrawal()">Request Withdrawal</button>
+        
+        <div style="margin-top: 20px;">
+            <p>WALLET: <span id="user-tokens" style="color: #f1c40f;">0</span> GAJAN TOKENS</p>
+            <button onclick="startMatch()" style="background: #27ae60; margin-bottom: 10px;">START RANDOM MATCH</button>
+            <button onclick="showQR()" style="background: #2980b9;">RECHARGE TOKENS (QR)</button>
+        </div>
     </div>
 
-    <script src="app.js"></script>
+    <div id="admin-box" class="hidden card">
+        <h2 style="color: #f1c40f;">MASTER ADMIN: MRGAJAN</h2>
+        <p>Control Token Supply & Users</p>
+        <input type="text" id="target" placeholder="Target User Name">
+        <input type="number" id="tokens" placeholder="Tokens to Add">
+        <button onclick="sendTokens()">Update User Wallet</button>
+        <hr style="border: 0.5px solid #333;">
+        <button onclick="location.reload()" style="background: #555;">LOGOUT</button>
+    </div>
+</div>
+
+<script>
+    // FIREBASE CONNECT (Tiktok-clone-g)
+    const firebaseConfig = {
+        apiKey: "AIzaSyDMqxLOV06iB...", // Screenshot se auto-detect
+        authDomain: "tiktok-clone-g.firebaseapp.com",
+        databaseURL: "https://tiktok-clone-g-default-rtdb.firebaseio.com",
+        projectId: "tiktok-clone-g",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function login() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+
+        if(u === "MRGAJAN" && p === "Abdul6353738585") {
+            document.getElementById('login-box').classList.add('hidden');
+            document.getElementById('admin-box').classList.remove('hidden');
+        } else if(u !== "") {
+            document.getElementById('welcome-msg').innerText = "SOLDIER: " + u;
+            document.getElementById('login-box').classList.add('hidden');
+            document.getElementById('game-hub').classList.remove('hidden');
+            loadData(u);
+        }
+    }
+
+    function loadData(user) {
+        db.ref('players/' + user).on('value', (s) => {
+            document.getElementById('user-tokens').innerText = s.val() || 0;
+        });
+    }
+
+    function sendTokens() {
+        const t = document.getElementById('target').value;
+        const amt = parseInt(document.getElementById('tokens').value);
+        if(t && amt) {
+            db.ref('players/' + t).set(amt);
+            alert("Tokens Updated for " + t);
+        }
+    }
+
+    function startMatch() {
+        alert("Searching for Players in Jamnagar Server...");
+        setTimeout(() => { alert("Match Found! Loading 3D Assets..."); }, 2000);
+    }
+
+    function showQR() {
+        window.open("https://res.cloudinary.com/dvfgzrxs7/image/upload/v1/gajan_live/qr.jpg");
+    }
+</script>
+
 </body>
 </html>
