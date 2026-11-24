@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GS Stylish</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:#f4f5f9;color:#202235}
+header{background:linear-gradient(135deg,#5d35df,#a333df);color:white;padding:20px}
+.logo{font-size:25px;font-weight:900}
+.logo span{background:white;color:#7436e5;border-radius:12px;padding:7px;margin-right:8px}
+header p{margin-top:8px;font-size:13px;opacity:.9}
+.container{max-width:700px;margin:auto;padding:15px}
+.card{background:white;padding:18px;border-radius:18px;margin-bottom:15px;box-shadow:0 4px 18px #00000008}
+h2{font-size:19px;margin-bottom:13px}
+h3{font-size:16px;margin-bottom:8px}
+input,button,select{width:100%;padding:13px;margin:7px 0;border-radius:12px;border:1px solid #ddd;font-size:15px}
+button{background:#7139e8;color:white;border:0;font-weight:bold;cursor:pointer}
+button.secondary{background:#eee;color:#333}
+button.red{background:#e84a63}
+.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:15px}
+.nav button{font-size:12px;padding:12px 5px}
+.balance{background:linear-gradient(135deg,#7139e8,#bd44d8);color:white;padding:22px;border-radius:20px}
+.balance h1{font-size:34px;margin:8px 0}
+.balance p{opacity:.85}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+.small{font-size:12px;color:#777;margin-top:6px}
+.hidden{display:none!important}
+.item{padding:13px;border:1px solid #eee;border-radius:13px;margin:8px 0}
+footer{text-align:center;padding:20px;color:#999;font-size:12px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span>GS</span> GS STYLISH</div>
+  <p>Welcome to GS Stylish Demo App</p>
+</header>
+
+<div class="container">
+
+<!-- LOGIN -->
+<section id="login">
+<div class="card">
+<h2>Welcome 👋</h2>
+<p class="small">Demo account login / create account</p>
+<input id="username" placeholder="Enter your username">
+<input id="password" type="password" placeholder="Enter password">
+<button onclick="login()">Login / Create Account</button>
+<p class="small">Demo only. Do not enter real passwords.</p>
+</div>
+</section>
+
+<!-- APP -->
+<section id="app" class="hidden">
+
+<div class="nav">
+<button onclick="showPage('home')">🏠 Home</button>
+<button onclick="showPage('wallet')">🪙 Coins</button>
+<button onclick="showPage('profile')">👤 Profile</button>
+<button onclick="showPage('admin')">⚙️ Demo Admin</button>
+</div>
+
+<!-- HOME -->
+<div id="home" class="page">
+<div class="card">
+<h2 id="welcome">Welcome</h2>
+<p>GS Stylish Demo Community</p>
+</div>
+
+<div class="card">
+<h3>✨ Featured</h3>
+<div class="item">🎨 Profile Styling</div>
+<div class="item">🌟 Special Profile Themes</div>
+<div class="item">🏆 Daily Activity Rewards</div>
+<div class="item">👑 GS Stylish Community</div>
+</div>
+
+<div class="card">
+<h3>🎁 Demo Reward</h3>
+<p>Claim a demo reward for testing the app.</p>
+<button onclick="reward()">Claim 10 Demo Coins</button>
+</div>
+</div>
+
+<!-- WALLET -->
+<div id="wallet" class="page hidden">
+<div class="balance">
+<p>DEMO COIN BALANCE</p>
+<h1 id="coins">0 🪙</h1>
+<p>Coins are for demo use only</p>
+</div>
+
+<div class="card">
+<h2>🪙 Demo Coin Store</h2>
+<p>Test the interface using non-cash demo coins.</p>
+<button onclick="addCoins(50)">Add 50 Demo Coins</button>
+<button onclick="addCoins(100)">Add 100 Demo Coins</button>
+<button onclick="addCoins(500)">Add 500 Demo Coins</button>
+<p class="small">No real payments are collected. Coins cannot be withdrawn or exchanged for cash.</p>
+</div>
+
+<div class="card">
+<h3>📜 Activity History</h3>
+<div id="history">No activity yet.</div>
+</div>
+</div>
+
+<!-- PROFILE -->
+<div id="profile" class="page hidden">
+<div class="card">
+<h2>👤 My Profile</h2>
+<div id="profileName"></div>
+<input id="newName" placeholder="Change display name">
+<button onclick="changeName()">Update Name</button>
+<button class="secondary" onclick="logout()">Logout</button>
+</div>
+</div>
+
+<!-- ADMIN DEMO -->
+<div id="admin" class="page hidden">
+<div class="card">
+<h2>⚙️ Demo Admin Panel</h2>
+<p class="small">Local demo controls only. Not a secure administrator system.</p>
+<input id="adminCoins" type="number" placeholder="Coins to add">
+<button onclick="adminAdd()">Add Demo Coins</button>
+<button class="red" onclick="resetDemo()">Reset Demo Data</button>
+</div>
+<div class="card">
+<h3>Demo Status</h3>
+<div id="adminInfo"></div>
+</div>
+</div>
+
+</section>
+<footer>GS Stylish • Prototype / Demo</footer>
+</div>
+
+<script>
+let data = JSON.parse(localStorage.getItem("gs_demo") || "null");
+
+function save(){
+  localStorage.setItem("gs_demo",JSON.stringify(data));
+  refresh();
+}
+
+function login(){
+  const name=document.getElementById("username").value.trim();
+  const pass=document.getElementById("password").value;
+  if(!name || !pass){
+    alert("Enter username and password");
+    return;
+  }
+  if(!data){
+    data={name:name,coins:0,history:[],rewarded:false};
+  }else{
+    data.name=name;
+  }
+  save();
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  showPage("home");
+}
+
+function showPage(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+  document.getElementById(page).classList.remove("hidden");
+  refresh();
+}
+
+function addCoins(amount){
+  data.coins+=amount;
+  data.history.unshift("+"+amount+" demo coins");
+  save();
+  alert(amount+" demo coins added!");
+}
+
+function reward(){
+  if(data.rewarded){
+    alert("Demo reward already claimed!");
+    return;
+  }
+  data.coins+=10;
+  data.rewarded=true;
+  data.history.unshift("+10 daily demo reward");
+  save();
+  alert("Reward claimed!");
+}
+
+function adminAdd(){
+  const amount=parseInt(document.getElementById("adminCoins").value);
+  if(!amount||amount<1||amount>10000){
+    alert("Enter a number from 1 to 10000");
+    return;
+  }
+  data.coins+=amount;
+  data.history.unshift("+ "+amount+" admin demo coins");
+  save();
+  alert("Demo coins added.");
+}
+
+function changeName(){
+  const n=document.getElementById("newName").value.trim();
+  if(!n)return alert("Enter new name");
+  data.name=n;
+  save();
+  alert("Display name updated");
+}
+
+function resetDemo(){
+  if(confirm("Reset this demo account?")){
+    localStorage.removeItem("gs_demo");
+    data=null;
+    location.reload();
+  }
+}
+
+function logout(){
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("login").classList.remove("hidden");
+}
+
+function refresh(){
+  if(!data)return;
+  document.getElementById("coins").innerText=data.coins+" 🪙";
+  document.getElementById("welcome").innerText="Welcome, "+data.name+" 👋";
+  document.getElementById("profileName").innerText="Username: "+data.name;
+  document.getElementById("history").innerHTML=
+    data.history.length
+    ? data.history.map(x=>'<div class="item">'+x+'</div>').join("")
+    : "No activity yet.";
+  document.getElementById("adminInfo").innerText=
+    "Current user: "+data.name+" | Demo coins: "+data.coins;
+}
+
+if(data){
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  showPage("home");
+}
+</script>
+</body>
+</html>
